@@ -4,85 +4,169 @@ const sunIcon = document.querySelector("#sun");
 const moonIcon = document.querySelector("#moon");
 const searchInput = document.querySelector("#search-header input");
 const tableContent = document.querySelector("#table-content table tbody");
+const table = document.querySelector("#table-content table tbody");
+console.log(table);
 /*Hacemos referencia al documentElement, para poder traer las variables declaradas en css,
 a través del objeto document.*/
 const documentEl = document.documentElement;
 /*Declaración de la lista de tokens y de monedas actualmente más usadas*/
 let fiatCoins = ["USD", "EUR", "ARS", "YEN"];
+
 let tokensList = [
     {
         "nombre": "Bitcoin",
         "acronimo": "BTC",
         "precio": "16851,16",
         "capitalMercado": "324,449,150,088",
-        "accionCirculacion": "19,253,075"
+        "accionCirculacion": "19,253,075",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "Ethereum",
         "acronimo": "ETH",
         "precio": "1250,02",
         "capitalMercado": "152,957,326,533",
-        "accionCirculacion": "122,373,866"
+        "accionCirculacion": "122,373,866",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "Tether",
         "acronimo": "USDT",
         "precio": "0,9998",
         "capitalMercado": "66,251,229,246",
-        "accionCirculacion": "66,263,713,430"
+        "accionCirculacion": "66,263,713,430",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "USD Coin",
         "acronimo": "USDC",
         "precio": "1,00",
         "capitalMercado": "44,262,814,059",
-        "accionCirculacion": "44,262,113,696"
+        "accionCirculacion": "44,262,113,696",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "BNB",
         "acronimo": "BNB",
         "precio": "256.86",
         "capitalMercado": "41,088,643,455",
-        "accionCirculacion": "159,963,937"
+        "accionCirculacion": "159,963,937",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "XRP",
         "acronimo": "XRP",
         "precio": "0,3418",
         "capitalMercado": "17,291,548,200",
-        "accionCirculacion": "50,563,767,827"
+        "accionCirculacion": "50,563,767,827",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "Dogecoin",
         "acronimo": "Doge",
         "precio": "0,07274",
         "capitalMercado": "9,649,542,739",
-        "accionCirculacion": "132,670,764,300"
+        "accionCirculacion": "132,670,764,300",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "Cardano",
         "acronimo": "ADA",
         "precio": "0,2667",
         "capitalMercado": "9,207,472,496",
-        "accionCirculacion": "34,518,640,464"
+        "accionCirculacion": "34,518,640,464",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "DAI",
         "acronimo": "DAI",
         "precio": "0,9999",
         "capitalMercado": "5,746,643,526",
-        "accionCirculacion": "5,747,338,664"
+        "accionCirculacion": "5,747,338,664",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     },
     {
         "nombre": "LiteCoin",
         "acronimo": "LTC",
         "precio": "74,41",
         "capitalMercado": "5,358,639,265",
-        "accionCirculacion": "71,986,542"
+        "accionCirculacion": "71,986,542",
+        "imgs":[
+            {
+                "src": "./assets/icons/add.png"
+            },
+            {
+                "src": "./assets/icons/remove.png"
+            }
+        ]
     }
 ];
 
 const agregarTokenALista = (token)=>{
+
     return `
         <tr>
             <td>${token.nombre}</td>
@@ -90,6 +174,10 @@ const agregarTokenALista = (token)=>{
             <td>${token.precio}</td>
             <td>${token.capitalMercado}</td>
             <td>${token.accionCirculacion}</td>
+            <td>
+                <img class="actionIcon" src="${token.imgs[0].src}" alt="Imagen no encontrada"></img>
+                <img class="actionIcon" src="${token.imgs[1].src}" alt="Imagen no encontrada"></img>
+            </td>
         </tr>
     `;
 }

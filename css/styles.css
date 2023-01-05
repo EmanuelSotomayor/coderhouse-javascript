@@ -81,7 +81,7 @@ body{
     display: flex;
     flex-direction: column;
     width: 700px;
-    height: 470px;
+    height: 530px;
     margin: 0 auto;
     background-color: var(--light-datatable-color);
     border-radius: 1%;
@@ -124,4 +124,8 @@ body{
 
 .crypto-list #table-content table tr:nth-child(2n){
     background-color: var(--light-color-background);
+}
+
+.actionIcon{
+    width: 20px;
 }
