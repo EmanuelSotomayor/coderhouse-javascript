@@ -98,6 +98,7 @@ body{
     padding: .65em;
     background-color: var(--light-color-background);
     border: none;
+    border-radius: .2em;
 }
 
 .crypto-list #table-content{

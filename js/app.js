@@ -5,7 +5,6 @@ const moonIcon = document.querySelector("#moon");
 const searchInput = document.querySelector("#search-header input");
 const tableContent = document.querySelector("#table-content table tbody");
 const table = document.querySelector("#table-content table tbody");
-console.log(table);
 /*Hacemos referencia al documentElement, para poder traer las variables declaradas en css,
 a través del objeto document.*/
 const documentEl = document.documentElement;
@@ -168,18 +167,19 @@ let tokensList = [
 const agregarTokenALista = (token)=>{
 
     return `
-        <tr>
+        <tr class="token">
             <td>${token.nombre}</td>
             <td>${token.acronimo}</td>
             <td>${token.precio}</td>
             <td>${token.capitalMercado}</td>
             <td>${token.accionCirculacion}</td>
             <td>
-                <img class="actionIcon" src="${token.imgs[0].src}" alt="Imagen no encontrada"></img>
-                <img class="actionIcon" src="${token.imgs[1].src}" alt="Imagen no encontrada"></img>
+                <img class="actionIcon add" src="${token.imgs[0].src}" alt="Imagen no encontrada"></img>
+                <img class="actionIcon remove" src="${token.imgs[1].src}" alt="Imagen no encontrada"></img>
             </td>
         </tr>
     `;
+
 }
 
 const filtrarTokens = ()=>{
@@ -200,10 +200,65 @@ const cargarTokens = (tokensFiltrados)=>{
         tabla+= agregarTokenALista(token);
     });
     tableContent.innerHTML = tabla;
+
+    verificarAccion();
+
 };
 
-const renderTokens = ()=>{
+const renderTokens = () =>{
     searchInput.addEventListener("input", filtrarTokens);
+};
+
+
+const verificarAccion = ()=>{
+
+    const allImgs = document.querySelectorAll(".actionIcon");
+        Array.from(allImgs).forEach((nodo)=>{
+            nodo.addEventListener("click", (e)=>{
+                const tokenSeleccionado = e.target.parentElement.parentElement;
+                if(e.target.classList.contains("add")){
+                    guardarTokenLocal(tokenSeleccionado);
+                }else{
+                    console.log("Estás eliminando algo");
+                    borrarTokenLocal(tokenSeleccionado);
+                }
+            });
+        });
+};
+
+const guardarTokenLocal = (tokenSeleccionado) =>{
+
+    const infoToken = tokenSeleccionado.querySelectorAll("td");
+    const nombre = infoToken[0].innerText;
+    const precio = infoToken[1].innerText;
+    const acronimo = infoToken[2].innerText;
+    const capitalMercado = infoToken[3].innerText;
+    const accionCirculacion = infoToken[4].innerText;
+
+    const token = {
+        "nombre": nombre,
+        "acronimo": acronimo,
+        "precio": precio,
+        "capitalMercado": capitalMercado,
+        "accionCirculacion": accionCirculacion,
+        "imgs":[
+            {
+                "src": infoToken[5].children[0].attributes[1].nodeValue
+            },
+            {
+                "src": infoToken[5].children[1].attributes[1].nodeValue
+            }
+        ]
+    }
+
+    localStorage.setItem(token.nombre, JSON.stringify(token));
+
+};
+
+const borrarTokenLocal = (tokenSeleccionado)=>{
+    const infoToken = tokenSeleccionado.querySelectorAll("td");
+    const nombre = infoToken[0].innerText;
+    localStorage.removeItem(nombre);
 };
 
 //Invocación para renderizar los tokens
