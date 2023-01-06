@@ -7,10 +7,11 @@
 :root{
     --dark-color-background: #16213E;
     --light-color-background: #EFF4FA;
-    --light-datatable-color: #FFFFFF;
     --light-switch-background-color: #FFFFFF;
     --dark-text-color: #000000;
     --light-text-color: #FFFFFFFF;
+    --light-datatable-color: #FFFFFF;
+    --dark-datatable-background-color: #0d1426;
 }
 
 body{
@@ -41,6 +42,7 @@ body{
     background-color: var(--light-switch-background-color);
     border: 1px solid transparent;
     transition: .5s all ease;
+    cursor: pointer;
 }
 
 .switch-item figure svg{
@@ -75,6 +77,7 @@ body{
     justify-content: center;
     align-items: center;
     width: 100%;
+    position: relative;
 }
 
 .crypto-list{
@@ -123,10 +126,66 @@ body{
     text-align: center;
 }
 
-.crypto-list #table-content table tr:nth-child(2n){
-    background-color: var(--light-color-background);
+.token td img{
+    cursor: pointer;
 }
 
 .actionIcon{
     width: 20px;
+}
+
+.popUpContainer{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: none;
+    z-index: 100;
+    background-color: #000000a6;
+    justify-content: center;
+    align-items: center;
+    transition: .5 ease all;
+}
+
+#popUp{
+    position: relative;
+    width: 300px;
+    height: 250px;
+    background-color: #FFFFFF;
+    z-index: 200;
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#popUp p{
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.closeBtn{
+    padding: .8em 4em;
+    border: white;
+    cursor: pointer;
+    position: absolute;
+    top: 61%;
+    color: var(--light-text-color);
+    font-weight: bold;
+    z-index: 300;
+}
+
+#popUp img{
+    margin-top: 1em;
+    position: absolute;
+    top: -40px;
+}
+
+.opened{
+    display: flex;
+}
+
+.closeBtn:hover{
+    background-color: red;
 }

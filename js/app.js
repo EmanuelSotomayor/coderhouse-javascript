@@ -1,13 +1,57 @@
+/*Hacemos referencia al documentElement, para poder traer las variables declaradas en css,
+a través del objeto document.*/
+const documentEl = document.documentElement;
+/*CONSTANTES CSS*/
+const darkModeVar = getComputedStyle(documentEl).getPropertyValue("--dark-color-background");
+const ligthModeVar = getComputedStyle(documentEl).getPropertyValue("--light-color-background");
+const darkModeText = getComputedStyle(documentEl).getPropertyValue("--dark-text-color");
+const ligthModeText = getComputedStyle(documentEl).getPropertyValue("--light-text-color");
+const darkModeBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-datatable-background-color");
+const ligthModeBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--light-datatable-color");
+const ligthModeSwitch = getComputedStyle(documentEl).getPropertyValue("--light-switch-background-color");
+/*RESTO DE CONSTANTES*/
 const switchButton = document.querySelector(".switch-item");
 const switchContainer = document.querySelector(".switch-container");
 const sunIcon = document.querySelector("#sun");
 const moonIcon = document.querySelector("#moon");
 const searchInput = document.querySelector("#search-header input");
+const searchContainer = document.querySelector("#search-header");
 const tableContent = document.querySelector("#table-content table tbody");
-const table = document.querySelector("#table-content table tbody");
-/*Hacemos referencia al documentElement, para poder traer las variables declaradas en css,
-a través del objeto document.*/
-const documentEl = document.documentElement;
+const tableBody = document.querySelector("#table-content");
+const tableAllHeaders = document.querySelector("#table-content table thead tr");
+const popUpContainer = document.querySelector(".popUpContainer");
+const popUpItem = document.querySelector("#popUp");
+const popUpCloseBtn = document.querySelector(".closeBtn");
+
+popUpCloseBtn.addEventListener("click", ()=>{
+    popUpContainer.classList.remove("opened");
+});
+
+//Objeto de configuración que contiene los mensajes a mostrar en el popUp
+
+const popUpConfig = [
+    {
+        "titulo": "Token guardado con éxito",
+        "src": "./assets/icons/added.png",
+        "color": "#4CAF50"
+    },
+    {
+        "titulo": "Token eliminado",
+        "src": "./assets/icons/removed.png",
+        "color": "#FF3D00"
+    },
+    {
+        "titulo": "El token ya se encuentra almacenado",
+        "src": "./assets/icons/warning.png",
+        "color": "#FFCA28"
+    },
+    {
+        "titulo": "El token no se encuentra almacenado",
+        "src": "./assets/icons/error.png",
+        "color": "#F44336"
+    }
+];
+
 /*Declaración de la lista de tokens y de monedas actualmente más usadas*/
 let fiatCoins = ["USD", "EUR", "ARS", "YEN"];
 
@@ -174,8 +218,8 @@ const agregarTokenALista = (token)=>{
             <td>${token.capitalMercado}</td>
             <td>${token.accionCirculacion}</td>
             <td>
-                <img class="actionIcon add" src="${token.imgs[0].src}" alt="Imagen no encontrada"></img>
-                <img class="actionIcon remove" src="${token.imgs[1].src}" alt="Imagen no encontrada"></img>
+                <img class="actionIcon add" src="${token.imgs[0].src}" alt="Imagen no encontrada"/>
+                <img class="actionIcon remove" src="${token.imgs[1].src}" alt="Imagen no encontrada"/>
             </td>
         </tr>
     `;
@@ -189,7 +233,6 @@ const filtrarTokens = ()=>{
         return token.nombre.toLowerCase().includes(datosBuscador);
     });
         if(tokensFiltrados.length > 0){
-            console.log(tokensFiltrados);
             cargarTokens(tokensFiltrados);
         }
 };
@@ -211,16 +254,24 @@ const renderTokens = () =>{
 
 
 const verificarAccion = ()=>{
-
     const allImgs = document.querySelectorAll(".actionIcon");
         Array.from(allImgs).forEach((nodo)=>{
             nodo.addEventListener("click", (e)=>{
                 const tokenSeleccionado = e.target.parentElement.parentElement;
                 if(e.target.classList.contains("add")){
-                    guardarTokenLocal(tokenSeleccionado);
+                    if(verificarTokenExistente(tokenSeleccionado) === null){
+                        guardarTokenLocal(tokenSeleccionado);
+                        abrirPopUp(popUpConfig[0].titulo, popUpConfig[0].src, popUpConfig[0].color);
+                    }else{
+                        abrirPopUp(popUpConfig[2].titulo, popUpConfig[2].src, popUpConfig[2].color);
+                    }
                 }else{
-                    console.log("Estás eliminando algo");
-                    borrarTokenLocal(tokenSeleccionado);
+                    if(verificarTokenExistente(tokenSeleccionado)){
+                        borrarTokenLocal(tokenSeleccionado);
+                        abrirPopUp(popUpConfig[1].titulo, popUpConfig[1].src, popUpConfig[1].color);
+                    }else{
+                        abrirPopUp(popUpConfig[3].titulo, popUpConfig[3].src, popUpConfig[3].color);
+                    }
                 }
             });
         });
@@ -250,9 +301,7 @@ const guardarTokenLocal = (tokenSeleccionado) =>{
             }
         ]
     }
-
-    localStorage.setItem(token.nombre, JSON.stringify(token));
-
+        localStorage.setItem(token.nombre, JSON.stringify(token));
 };
 
 const borrarTokenLocal = (tokenSeleccionado)=>{
@@ -261,39 +310,59 @@ const borrarTokenLocal = (tokenSeleccionado)=>{
     localStorage.removeItem(nombre);
 };
 
+const verificarTokenExistente = (tokenSeleccionado)=>{
+    const infoToken = tokenSeleccionado.querySelectorAll("td");
+    const nombre = infoToken[0].innerText;
+    return localStorage.getItem(nombre);
+};
+
 //Invocación para renderizar los tokens
 renderTokens();
 
 
+//Apertura y cierre del popUp al agregar o borrar un token del localStorage
+
+const abrirPopUp = (titulo, icono, colorBoton)=>{
+    popUpContainer.classList.add("opened");
+    popUpItem.innerHTML = `
+        <img src="${icono}" alt="Icono no encontrado"/>
+        <p id="title">${titulo}</p>
+    `;
+    popUpContainer.children[1].style.setProperty("background-color", colorBoton);
+};
+
 const switchPageMode = ()=>{
-
-    const darkModeVar = getComputedStyle(documentEl).getPropertyValue("--dark-color-background");
-    const ligthModeVar = getComputedStyle(documentEl).getPropertyValue("--light-color-background");
-    const darkModeText = getComputedStyle(documentEl).getPropertyValue("--dark-text-color");
-    const ligthModeText = getComputedStyle(documentEl).getPropertyValue("--light-text-color");
-    const ligthModeSwitch = getComputedStyle(documentEl).getPropertyValue("--light-switch-background-color");
-
     switchButton.addEventListener('click', ()=>{
         switchButton.classList.toggle("ligthMode");
         switchButton.classList.toggle("darkMode");
+        const trBackgroundElements = document.querySelector(".crypto-list #table-content table tr:nth-child(2n)");
             if(switchButton.classList.contains("darkMode")){
                 switchButton.style.transform = "translate(125%, -50%)";
                 switchContainer.style.backgroundColor = ligthModeSwitch;
                 switchButton.style.backgroundColor = darkModeVar;
                 changeIcons(moonIcon, sunIcon, "darkMode");
                 changeBackground(darkModeVar);
+                changeTableColor(darkModeBackgroundColor, ligthModeText);
             }else{
                 switchButton.style.transform = "translate(15%, -50%)";
                 switchContainer.style.backgroundColor = darkModeVar;
                 switchButton.style.backgroundColor = ligthModeSwitch;
                 changeIcons(moonIcon, sunIcon, "sunMode");
                 changeBackground(ligthModeVar);
+                changeTableColor(ligthModeBackgroundColor, darkModeText);
             }
     });
 };
 
 const changeBackground = (backgroundColor)=>{
     document.body.style.setProperty("background-color", backgroundColor);
+};
+
+const changeTableColor = (headerBodyColor, textColor) =>{
+        searchContainer.style.setProperty("background-color", headerBodyColor);
+        tableBody.style.setProperty("background-color", headerBodyColor);
+        tableAllHeaders.style.setProperty("color", textColor);
+        tableContent.style.setProperty("color", textColor);
 };
 
 const changeIcons = (moon, sun, classMode)=>{
