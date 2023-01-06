@@ -9,9 +9,13 @@
     --light-color-background: #EFF4FA;
     --light-switch-background-color: #FFFFFF;
     --dark-text-color: #000000;
-    --light-text-color: #FFFFFFFF;
+    --light-text-color: #FFFFFF;
     --light-datatable-color: #FFFFFF;
     --dark-datatable-background-color: #0d1426;
+    --dark-popUpContainer-background-color: #000000a6;
+    --light-popUpContainer-background-color: #414141a8;
+    --dark-popUpItem-background-color: #35363A;
+    --ligth-popUpItem-background-color: #FFFFFF;
 }
 
 body{
@@ -140,7 +144,7 @@ body{
     position: absolute;
     display: none;
     z-index: 100;
-    background-color: #000000a6;
+    background-color: var(--dark-popUpContainer-background-color);
     justify-content: center;
     align-items: center;
     transition: .5 ease all;
@@ -161,7 +165,6 @@ body{
 
 #popUp p{
     font-size: 1em;
-    font-weight: bold;
     text-align: center;
 }
 

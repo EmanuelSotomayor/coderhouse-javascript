@@ -9,6 +9,10 @@ const ligthModeText = getComputedStyle(documentEl).getPropertyValue("--light-tex
 const darkModeBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-datatable-background-color");
 const ligthModeBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--light-datatable-color");
 const ligthModeSwitch = getComputedStyle(documentEl).getPropertyValue("--light-switch-background-color");
+const darkPopUpBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-popUpContainer-background-color");
+const lightPopUpBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--light-popUpContainer-background-color");
+const darkPopUpItemBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-popUpItem-background-color");
+const lightPopUpItemBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--ligth-popUpItem-background-color");
 /*RESTO DE CONSTANTES*/
 const switchButton = document.querySelector(".switch-item");
 const switchContainer = document.querySelector(".switch-container");
@@ -228,7 +232,6 @@ const agregarTokenALista = (token)=>{
 
 const filtrarTokens = ()=>{
     let datosBuscador = searchInput.value.trim().toLowerCase();
-    console.log(datosBuscador);
     let tokensFiltrados = tokensList.filter((token)=>{
         return token.nombre.toLowerCase().includes(datosBuscador);
     });
@@ -329,6 +332,11 @@ const abrirPopUp = (titulo, icono, colorBoton)=>{
         <p id="title">${titulo}</p>
     `;
     popUpContainer.children[1].style.setProperty("background-color", colorBoton);
+        if(switchButton.classList.contains("darkMode")){
+            changePopUp(darkPopUpItemBackgroundColor, ligthModeText);
+        }else{
+            changePopUp(lightPopUpItemBackgroundColor, darkModeText);
+        }
 };
 
 const switchPageMode = ()=>{
@@ -375,6 +383,13 @@ const changeIcons = (moon, sun, classMode)=>{
             sunIcon.style.setProperty("display", "none");
             sunIcon.firstElementChild.style.fill = '#FFFFFFFF';
         }
+};
+
+const changePopUp = (backgroundColorPopUp, textColorPopUp, backgroundContainer)=>{
+    popUpItem.style.setProperty("background-color", backgroundColorPopUp);
+    //popUpItem.children[1]
+    popUpItem.children[1].style.setProperty("color", textColorPopUp);
+    popUpContainer.style.setProperty("background-color", backgroundContainer);
 };
 
 //Invocación del darkMode-LigthMode
