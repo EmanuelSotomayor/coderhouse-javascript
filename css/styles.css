@@ -87,11 +87,11 @@ body{
 .crypto-list{
     display: flex;
     flex-direction: column;
-    width: 700px;
-    height: 530px;
+    width: 800px;
     margin: 0 auto;
     background-color: var(--light-datatable-color);
-    border-radius: 1%;
+    border-radius: .3em;
+    margin-top: 1.5em;
 }
 
 .crypto-list #search-header{
@@ -114,6 +114,8 @@ body{
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
+    text-align: right;
+    flex-direction: column;
 }
 
 .crypto-list #table-content table{
@@ -123,10 +125,14 @@ body{
 
 .crypto-list #table-content table th{
     border-bottom: .5px solid rgb(247, 246, 246);
+    padding: 1em;
+    font-size: .9em;
+    white-space: nowrap;
+    text-align: center;
 }
 
-.crypto-list #table-content table th, td{
-    padding: .5em;
+.crypto-list #table-content table td{
+    padding: .7em;
     text-align: center;
 }
 
@@ -191,4 +197,33 @@ body{
 
 .closeBtn:hover{
     background-color: red;
+}
+
+.tokenImg{
+    width: 20px;
+    height: 20px;
+}
+
+.buttons{
+    display: flex;
+    justify-content: right;
+    width: 100%;
+    padding: .5em;
+    position: relative;
+}
+
+.buttons button{
+    margin: .3em;
+    background-color: transparent;
+    border: 1px solid #17A2B8;
+    padding: .5em .7em;
+    text-align: center;
+    color: #17A2B8;
+    cursor: pointer;
+    border-radius: .3em;
+}
+
+.buttons button:hover{
+    color: var(--light-text-color);
+    background-color: #17A2B8;
 }

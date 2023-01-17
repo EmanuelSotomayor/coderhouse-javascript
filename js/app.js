@@ -1,3 +1,7 @@
+/*Importación de modulos*/
+import { popUpConfig } from './popUp.js';
+import { Token } from './token.js';
+
 /*Hacemos referencia al documentElement, para poder traer las variables declaradas en css,
 a través del objeto document.*/
 const documentEl = document.documentElement;
@@ -9,8 +13,6 @@ const ligthModeText = getComputedStyle(documentEl).getPropertyValue("--light-tex
 const darkModeBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-datatable-background-color");
 const ligthModeBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--light-datatable-color");
 const ligthModeSwitch = getComputedStyle(documentEl).getPropertyValue("--light-switch-background-color");
-const darkPopUpBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-popUpContainer-background-color");
-const lightPopUpBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--light-popUpContainer-background-color");
 const darkPopUpItemBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--dark-popUpItem-background-color");
 const lightPopUpItemBackgroundColor = getComputedStyle(documentEl).getPropertyValue("--ligth-popUpItem-background-color");
 /*RESTO DE CONSTANTES*/
@@ -26,198 +28,105 @@ const tableAllHeaders = document.querySelector("#table-content table thead tr");
 const popUpContainer = document.querySelector(".popUpContainer");
 const popUpItem = document.querySelector("#popUp");
 const popUpCloseBtn = document.querySelector(".closeBtn");
+/*CONTROLES DE PAGINACIÓN*/
+const btnPrev = document.querySelector("#btn_prev");
+const btnProx = document.querySelector("#btn_prox");
 
-popUpCloseBtn.addEventListener("click", ()=>{
-    popUpContainer.classList.remove("opened");
+let tokenListAux = [];
+let pagina_actual = 1;
+let tokens_por_pagina = 8;
+
+const obtenerTokens = async (pagina, tokensPorPagina) =>{
+
+    const URLBase = "https://api.coingecko.com/api/v3/coins/markets";
+
+    try{
+        const fetchData = await fetch(`${URLBase}?vs_currency=usd&order=market_cap_desc&per_page=${tokensPorPagina}&page=${pagina}&sparkline=false`);
+        const data = await fetchData.json();
+        return data;
+    }catch(error){
+        console.log(error);
+    }
+};
+
+const llenarArrayTokens = async (data)=>{
+
+    /*Usamos esta expresión regular para detectar cuando el precio de un token
+    viene con notación exponencial "e", va a detectar sí viene la e en minuscula o mayuscula*/
+    const regExp = /[e]|[E]/gi;
+
+    data.forEach((token)=>{
+        let tokenAux = new Token();
+        tokenAux.nombre = token.name;
+        tokenAux.acronimo = token.symbol;
+
+        /*Convertirmos el precio a string, para poder pasar la expresión regular,
+        sí el precio contiene una notación exponencial, entonces le pasamos la función
+        transformarDecimales() que toma el precio en float y calcula los decimales
+        que debe aplicarle, en este caso, 12.
+        De lo contrario, solo setea el precio normalmente.*/
+
+        regExp.test(token.current_price.toString()) ? 
+        tokenAux.precio = transformarDecimales(token.current_price, 12) : 
+        tokenAux.precio = token.current_price;
+
+        tokenAux.capitalMercado = token.market_cap;
+        tokenAux.accionCirculacion = token.total_volume;
+        tokenAux.imgs.push({"src": "./assets/icons/add.png"}
+        );
+        tokenAux.imgs.push({"src": "./assets/icons/remove.png"}
+        );
+        tokenAux.imgs.push({"src": `${token.image}`});
+        tokenListAux.push(tokenAux);
+    });
+};
+
+btnPrev.addEventListener("click", async ()=>{
+    if(pagina_actual > 1){
+        pagina_actual--;
+        const tokenData = await obtenerTokens(pagina_actual, tokens_por_pagina);
+        llenarArrayTokens(tokenData);
+        cargarTokens(tokenListAux);
+        tokenListAux.length = 0;
+    }
 });
 
-//Objeto de configuración que contiene los mensajes a mostrar en el popUp
-
-const popUpConfig = [
-    {
-        "titulo": "Token guardado con éxito",
-        "src": "./assets/icons/added.png",
-        "color": "#4CAF50"
-    },
-    {
-        "titulo": "Token eliminado",
-        "src": "./assets/icons/removed.png",
-        "color": "#FF3D00"
-    },
-    {
-        "titulo": "El token ya se encuentra almacenado",
-        "src": "./assets/icons/warning.png",
-        "color": "#FFCA28"
-    },
-    {
-        "titulo": "El token no se encuentra almacenado",
-        "src": "./assets/icons/error.png",
-        "color": "#F44336"
+btnProx.addEventListener("click", async ()=>{
+    if(pagina_actual >= 1){
+        pagina_actual++;
+        const tokenData = await obtenerTokens(pagina_actual, tokens_por_pagina);
+        llenarArrayTokens(tokenData);
+        cargarTokens(tokenListAux);
+        tokenListAux.length = 0;
     }
-];
+});
 
-/*Declaración de la lista de tokens y de monedas actualmente más usadas*/
-let fiatCoins = ["USD", "EUR", "ARS", "YEN"];
+/*Cuando el DOM está cargado, muestra los primero 8 tokens*/
+document.addEventListener("DOMContentLoaded", async ()=>{
+    const tokenData = await obtenerTokens(1, 8);
+    llenarArrayTokens(tokenData);
+    cargarTokens(tokenListAux);
+    tokenListAux.length = 0;
+});
 
-let tokensList = [
-    {
-        "nombre": "Bitcoin",
-        "acronimo": "BTC",
-        "precio": "16851,16",
-        "capitalMercado": "324,449,150,088",
-        "accionCirculacion": "19,253,075",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "Ethereum",
-        "acronimo": "ETH",
-        "precio": "1250,02",
-        "capitalMercado": "152,957,326,533",
-        "accionCirculacion": "122,373,866",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "Tether",
-        "acronimo": "USDT",
-        "precio": "0,9998",
-        "capitalMercado": "66,251,229,246",
-        "accionCirculacion": "66,263,713,430",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "USD Coin",
-        "acronimo": "USDC",
-        "precio": "1,00",
-        "capitalMercado": "44,262,814,059",
-        "accionCirculacion": "44,262,113,696",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "BNB",
-        "acronimo": "BNB",
-        "precio": "256.86",
-        "capitalMercado": "41,088,643,455",
-        "accionCirculacion": "159,963,937",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "XRP",
-        "acronimo": "XRP",
-        "precio": "0,3418",
-        "capitalMercado": "17,291,548,200",
-        "accionCirculacion": "50,563,767,827",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "Dogecoin",
-        "acronimo": "Doge",
-        "precio": "0,07274",
-        "capitalMercado": "9,649,542,739",
-        "accionCirculacion": "132,670,764,300",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "Cardano",
-        "acronimo": "ADA",
-        "precio": "0,2667",
-        "capitalMercado": "9,207,472,496",
-        "accionCirculacion": "34,518,640,464",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "DAI",
-        "acronimo": "DAI",
-        "precio": "0,9999",
-        "capitalMercado": "5,746,643,526",
-        "accionCirculacion": "5,747,338,664",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
-    },
-    {
-        "nombre": "LiteCoin",
-        "acronimo": "LTC",
-        "precio": "74,41",
-        "capitalMercado": "5,358,639,265",
-        "accionCirculacion": "71,986,542",
-        "imgs":[
-            {
-                "src": "./assets/icons/add.png"
-            },
-            {
-                "src": "./assets/icons/remove.png"
-            }
-        ]
+/*Esta función permite formatear un número con notacion exponencial
+a decimales, ya que la API en algunos tokens, retorna su precio
+como notación cientifica porque tiene muchos decimales*/
+function transformarDecimales(value, precision = 0){
+    if ( (0.9).toFixed() !== '1' ){
+        return value.toFixed(precision);
     }
-];
+    let pow = Math.pow( 10, precision );
+    return (Math.round( value * pow ) / pow).toFixed(precision);
+}                                                           
 
 const agregarTokenALista = (token)=>{
 
     return `
         <tr class="token">
-            <td>${token.nombre}</td>
-            <td>${token.acronimo}</td>
+            <td><img class="tokenImg" src="${token.imgs[2].src}" alt="Imagen no encontrada"/> 
+            ${token.nombre}</td>
+            <td>${token.acronimo.toUpperCase()}</td>
             <td>${token.precio}</td>
             <td>${token.capitalMercado}</td>
             <td>${token.accionCirculacion}</td>
@@ -227,18 +136,33 @@ const agregarTokenALista = (token)=>{
             </td>
         </tr>
     `;
-
 }
 
-const filtrarTokens = ()=>{
+const filtrarTokens = async ()=>{
+    //Le damos longitud 0 al array para que todos sus elementos se borren
+    tokenListAux.length = 0;
+    //Limpiamos todo lo que hay en el contenedor de la tabla
+    tableContent.innerHTML = "";
     let datosBuscador = searchInput.value.trim().toLowerCase();
-    let tokensFiltrados = tokensList.filter((token)=>{
+    let data = await obtenerTokens(1, 250);
+    llenarArrayTokens(data);
+    let tokensFiltrados = tokenListAux.filter((token)=>{
         return token.nombre.toLowerCase().includes(datosBuscador);
     });
         if(tokensFiltrados.length > 0){
             cargarTokens(tokensFiltrados);
         }
+
+        if(searchInput.value == ""){
+            tokenListAux.length = 0;
+            pagina_actual = 1;
+            let data = await obtenerTokens(pagina_actual, tokens_por_pagina);
+            llenarArrayTokens(data);
+            cargarTokens(tokenListAux);
+        }
 };
+
+searchInput.addEventListener("input", filtrarTokens);
 
 const cargarTokens = (tokensFiltrados)=>{
     let tabla = "";
@@ -246,15 +170,8 @@ const cargarTokens = (tokensFiltrados)=>{
         tabla+= agregarTokenALista(token);
     });
     tableContent.innerHTML = tabla;
-
     verificarAccion();
-
 };
-
-const renderTokens = () =>{
-    searchInput.addEventListener("input", filtrarTokens);
-};
-
 
 const verificarAccion = ()=>{
     const allImgs = document.querySelectorAll(".actionIcon");
@@ -289,22 +206,17 @@ const guardarTokenLocal = (tokenSeleccionado) =>{
     const capitalMercado = infoToken[3].innerText;
     const accionCirculacion = infoToken[4].innerText;
 
-    const token = {
-        "nombre": nombre,
-        "acronimo": acronimo,
-        "precio": precio,
-        "capitalMercado": capitalMercado,
-        "accionCirculacion": accionCirculacion,
-        "imgs":[
-            {
-                "src": infoToken[5].children[0].attributes[1].nodeValue
-            },
-            {
-                "src": infoToken[5].children[1].attributes[1].nodeValue
-            }
-        ]
-    }
-        localStorage.setItem(token.nombre, JSON.stringify(token));
+    const tokenAux = new Token();
+    tokenAux.nombre = nombre;
+    tokenAux.acronimo = acronimo;
+    tokenAux.precio = precio;
+    tokenAux.capitalMercado = capitalMercado;
+    tokenAux.accionCirculacion = accionCirculacion;
+    tokenAux.imgs.push(infoToken[5].children[0].attributes[1].nodeValue);
+    tokenAux.imgs.push(infoToken[5].children[1].attributes[1].nodeValue);
+    tokenAux.imgs.push(tokenSeleccionado.childNodes[1].childNodes[0].attributes[1].nodeValue);
+
+    localStorage.setItem(tokenAux.nombre, JSON.stringify(tokenAux));
 };
 
 const borrarTokenLocal = (tokenSeleccionado)=>{
@@ -319,12 +231,7 @@ const verificarTokenExistente = (tokenSeleccionado)=>{
     return localStorage.getItem(nombre);
 };
 
-//Invocación para renderizar los tokens
-renderTokens();
-
-
 //Apertura y cierre del popUp al agregar o borrar un token del localStorage
-
 const abrirPopUp = (titulo, icono, colorBoton)=>{
     popUpContainer.classList.add("opened");
     popUpItem.innerHTML = `
@@ -333,13 +240,17 @@ const abrirPopUp = (titulo, icono, colorBoton)=>{
     `;
     popUpContainer.children[1].style.setProperty("background-color", colorBoton);
         if(switchButton.classList.contains("darkMode")){
-            changePopUp(darkPopUpItemBackgroundColor, ligthModeText);
+            cambiarPopUp(darkPopUpItemBackgroundColor, ligthModeText);
         }else{
-            changePopUp(lightPopUpItemBackgroundColor, darkModeText);
+            cambiarPopUp(lightPopUpItemBackgroundColor, darkModeText);
         }
 };
 
-const switchPageMode = ()=>{
+popUpCloseBtn.addEventListener("click", ()=>{
+    popUpContainer.classList.remove("opened");
+});
+
+const cambiarModo = ()=>{
     switchButton.addEventListener('click', ()=>{
         switchButton.classList.toggle("ligthMode");
         switchButton.classList.toggle("darkMode");
@@ -348,32 +259,32 @@ const switchPageMode = ()=>{
                 switchButton.style.transform = "translate(125%, -50%)";
                 switchContainer.style.backgroundColor = ligthModeSwitch;
                 switchButton.style.backgroundColor = darkModeVar;
-                changeIcons(moonIcon, sunIcon, "darkMode");
-                changeBackground(darkModeVar);
-                changeTableColor(darkModeBackgroundColor, ligthModeText);
+                cambiarIconos(moonIcon, sunIcon, "darkMode");
+                cambiarFondo(darkModeVar);
+                cambiarTabla(darkModeBackgroundColor, ligthModeText);
             }else{
                 switchButton.style.transform = "translate(15%, -50%)";
                 switchContainer.style.backgroundColor = darkModeVar;
                 switchButton.style.backgroundColor = ligthModeSwitch;
-                changeIcons(moonIcon, sunIcon, "sunMode");
-                changeBackground(ligthModeVar);
-                changeTableColor(ligthModeBackgroundColor, darkModeText);
+                cambiarIconos(moonIcon, sunIcon, "sunMode");
+                cambiarFondo(ligthModeVar);
+                cambiarTabla(ligthModeBackgroundColor, darkModeText);
             }
     });
 };
 
-const changeBackground = (backgroundColor)=>{
+const cambiarFondo = (backgroundColor)=>{
     document.body.style.setProperty("background-color", backgroundColor);
 };
 
-const changeTableColor = (headerBodyColor, textColor) =>{
+const cambiarTabla = (headerBodyColor, textColor) =>{
         searchContainer.style.setProperty("background-color", headerBodyColor);
         tableBody.style.setProperty("background-color", headerBodyColor);
         tableAllHeaders.style.setProperty("color", textColor);
         tableContent.style.setProperty("color", textColor);
 };
 
-const changeIcons = (moon, sun, classMode)=>{
+const cambiarIconos = (moon, sun, classMode)=>{
         if(classMode === "darkMode"){
             moon.style.setProperty("display", "none");
             sun.style.setProperty("display", "block");
@@ -385,12 +296,11 @@ const changeIcons = (moon, sun, classMode)=>{
         }
 };
 
-const changePopUp = (backgroundColorPopUp, textColorPopUp, backgroundContainer)=>{
+const cambiarPopUp = (backgroundColorPopUp, textColorPopUp, backgroundContainer)=>{
     popUpItem.style.setProperty("background-color", backgroundColorPopUp);
-    //popUpItem.children[1]
     popUpItem.children[1].style.setProperty("color", textColorPopUp);
     popUpContainer.style.setProperty("background-color", backgroundContainer);
 };
 
-//Invocación del darkMode-LigthMode
-switchPageMode();
+//Invocación del Dark mode / Light mode
+cambiarModo();
