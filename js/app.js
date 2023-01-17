@@ -57,8 +57,9 @@ const llenarArrayTokens = async (data)=>{
 
     data.forEach((token)=>{
         let tokenAux = new Token();
-        tokenAux.nombre = token.name;
-        tokenAux.acronimo = token.symbol;
+        const {name, symbol, current_price, market_cap, total_volume, image} = token;
+        tokenAux.nombre = name;
+        tokenAux.acronimo = symbol;
 
         /*Convertirmos el precio a string, para poder pasar la expresión regular,
         sí el precio contiene una notación exponencial, entonces le pasamos la función
@@ -66,17 +67,17 @@ const llenarArrayTokens = async (data)=>{
         que debe aplicarle, en este caso, 12.
         De lo contrario, solo setea el precio normalmente.*/
 
-        regExp.test(token.current_price.toString()) ? 
-        tokenAux.precio = transformarDecimales(token.current_price, 12) : 
-        tokenAux.precio = token.current_price;
+        regExp.test(current_price.toString()) ? 
+        tokenAux.precio = transformarDecimales(current_price, 12) : 
+        tokenAux.precio = current_price;
 
-        tokenAux.capitalMercado = token.market_cap;
-        tokenAux.accionCirculacion = token.total_volume;
+        tokenAux.capitalMercado = market_cap;
+        tokenAux.accionCirculacion = total_volume;
         tokenAux.imgs.push({"src": "./assets/icons/add.png"}
         );
         tokenAux.imgs.push({"src": "./assets/icons/remove.png"}
         );
-        tokenAux.imgs.push({"src": `${token.image}`});
+        tokenAux.imgs.push({"src": `${image}`});
         tokenListAux.push(tokenAux);
     });
 };
@@ -122,14 +123,16 @@ function transformarDecimales(value, precision = 0){
 
 const agregarTokenALista = (token)=>{
 
+    const {nombre, acronimo, precio, capitalMercado, accionCirculacion} = token;
+
     return `
         <tr class="token">
             <td><img class="tokenImg" src="${token.imgs[2].src}" alt="Imagen no encontrada"/> 
-            ${token.nombre}</td>
-            <td>${token.acronimo.toUpperCase()}</td>
-            <td>${token.precio}</td>
-            <td>${token.capitalMercado}</td>
-            <td>${token.accionCirculacion}</td>
+            ${nombre}</td>
+            <td>${acronimo.toUpperCase()}</td>
+            <td>${precio}</td>
+            <td>${capitalMercado}</td>
+            <td>${accionCirculacion}</td>
             <td>
                 <img class="actionIcon add" src="${token.imgs[0].src}" alt="Imagen no encontrada"/>
                 <img class="actionIcon remove" src="${token.imgs[1].src}" alt="Imagen no encontrada"/>
