@@ -28,6 +28,8 @@ const tableAllHeaders = document.querySelector("#table-content table thead tr");
 const popUpContainer = document.querySelector(".popUpContainer");
 const popUpItem = document.querySelector("#popUp");
 const popUpCloseBtn = document.querySelector(".closeBtn");
+const table = document.querySelector(".crypto-list");
+const navbarItemsVisited = document.querySelectorAll("#navbar #items li a");
 /*CONTROLES DE PAGINACIÓN*/
 const btnPrev = document.querySelector("#btn_prev");
 const btnProx = document.querySelector("#btn_prox");
@@ -257,27 +259,34 @@ const cambiarModo = ()=>{
     switchButton.addEventListener('click', ()=>{
         switchButton.classList.toggle("ligthMode");
         switchButton.classList.toggle("darkMode");
-        const trBackgroundElements = document.querySelector(".crypto-list #table-content table tr:nth-child(2n)");
             if(switchButton.classList.contains("darkMode")){
-                switchButton.style.transform = "translate(125%, -50%)";
+                switchButton.style.transform = "translate(109%, -55%)";
                 switchContainer.style.backgroundColor = ligthModeSwitch;
                 switchButton.style.backgroundColor = darkModeVar;
                 cambiarIconos(moonIcon, sunIcon, "darkMode");
                 cambiarFondo(darkModeVar);
                 cambiarTabla(darkModeBackgroundColor, ligthModeText);
+                cambiarColorLinksVisitados(ligthModeText);
+                table.style.setProperty("border", "none");
             }else{
-                switchButton.style.transform = "translate(15%, -50%)";
+                switchButton.style.transform = "translate(10%, -55%)";
                 switchContainer.style.backgroundColor = darkModeVar;
                 switchButton.style.backgroundColor = ligthModeSwitch;
                 cambiarIconos(moonIcon, sunIcon, "sunMode");
                 cambiarFondo(ligthModeVar);
                 cambiarTabla(ligthModeBackgroundColor, darkModeText);
+                cambiarColorLinksVisitados(darkModeText);
+                table.style.setProperty("border", "1px solid rgb(247, 246, 246)");
             }
     });
 };
 
 const cambiarFondo = (backgroundColor)=>{
     document.body.style.setProperty("background-color", backgroundColor);
+};
+
+const cambiarColorLinksVisitados = (color)=>{
+    navbarItemsVisited.forEach(link=>link.style.setProperty("color", color));
 };
 
 const cambiarTabla = (headerBodyColor, textColor) =>{

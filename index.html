@@ -8,6 +8,9 @@
         <meta name="description" content="MyCryptoPlace, es una aplicación que permite obtener el precio de criptomonedas">
         <meta name="title" content="Descubre MyCryptoPlace y sigue las tendencias de los tokens">
         <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Signika:wght@300;600&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="./css/styles.css"/>
         <title>MyCryptoPlace - Inicio</title>
     </head>
@@ -18,7 +21,14 @@
             <button type="button" class="closeBtn">Cerrar</button>
         </div>
 
-        <header>
+        <header class="navbar-container">
+            <nav id="navbar">
+                <img id="logo" src="assets/logo.svg" alt="Logo no encontrado"/>
+                <ul id="items">
+                    <li><a href="./index.html">Inicio</a></li>
+                    <li><a href="./cryptocalculator.html">Cotizadora</a></li>
+                </ul>
+            </nav>
             <div class="switch-container">
                 <button class="switch-item ligthMode">
                     <figure id="moon">
@@ -60,6 +70,8 @@
 
             </section>
         </main>
+
     <script type="module" src="js/app.js"></script>
+
     </body>
 </html>
